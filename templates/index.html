@@ -1,79 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Forex Trading Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        let countdown = 60;
-        function startTimer() {
-            setInterval(function(){
-                countdown--;
-                if(countdown <= 0){
-                    countdown = 60;
-                    refreshData();
-                }
-                document.getElementById("countdown").innerText = countdown + "s";
-            },1000);
-        }
-
-        async function refreshData() {
-            const res = await fetch('/api/data');
-            const data = await res.json();
-            document.getElementById("signal").innerText = data.signal;
-            document.getElementById("pair").innerText = data.pair;
-            document.getElementById("time").innerText = data.time;
-            for (const [key, value] of Object.entries(data.indicators)) {
-                let el = document.getElementById(key);
-                if (el) el.innerText = value.toFixed(2);
-            }
-            let histDiv = document.getElementById("history");
-            histDiv.innerHTML = "";
-            data.history.forEach(h => {
-                let p = document.createElement("p");
-                p.innerText = h.time + " → " + h.signal;
-                histDiv.appendChild(p);
-            });
-        }
-        window.onload = function(){
-            refreshData();
-            startTimer();
-        };
-    </script>
+    <title>Forex Dashboard</title>
+    <style>
+        body { background:#0b0f19; color:#eee; font-family: Arial; text-align:center; }
+        .buy { color:lime; font-weight:bold; }
+        .sell { color:red; font-weight:bold; }
+        .hold { color:gray; }
+        .mode { padding:10px; margin:10px; border-radius:5px; }
+        .strict { background:red; }
+        .normal { background:green; }
+    </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Forex Trading Dashboard</h1>
-        <form method="POST">
-            <label for="pair">Choose Pair:</label>
-            <select name="pair" id="pair-select" onchange="this.form.submit()">
-                {% for p in pairs %}
-                    <option value="{{p}}" {% if pairs[p] == pair %}selected{% endif %}>{{p}}</option>
-                {% endfor %}
-            </select>
-        </form>
-        <h2 id="pair">{{ pair }}</h2>
-        <h3>Last update: <span id="time"></span> | Refresh in: <span id="countdown">60s</span></h3>
+    <h1>Forex Dashboard</h1>
+    <div class="mode {% if mode=='strict' %}strict{% else %}normal{% endif %}">
+        Mode: {{mode.upper()}}
     </div>
-    <div class="grid">
-        <div class="card signal">
-            <h2>SIGNAL</h2>
-            <p id="signal">{{ signal }}</p>
-        </div>
-        <div class="card"><h2>EMA 8</h2><p id="ema8">{{ indicators['ema8'] }}</p></div>
-        <div class="card"><h2>EMA 21</h2><p id="ema21">{{ indicators['ema21'] }}</p></div>
-        <div class="card"><h2>MACD</h2><p id="macd">{{ indicators['macd'] }}</p></div>
-        <div class="card"><h2>RSI</h2><p id="rsi">{{ indicators['rsi'] }}</p></div>
-        <div class="card"><h2>ADX</h2><p id="adx">{{ indicators['adx'] }}</p></div>
-        <div class="card"><h2>Price</h2><p id="price">{{ indicators['price'] }}</p></div>
-        <div class="card history">
-            <h2>Signal History</h2>
-            <div id="history">
-                {% for h in history %}
-                    <p>{{h.time}} → {{h.signal}}</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
+    <form method="get">
+        <label>Choose Pair:</label>
+        <select name="pair">
+            {% for k,v in pairs.items() %}
+                <option value="{{k}}" {% if k==active_pair %}selected{% endif %}>{{k}}</option>
+            {% endfor %}
+        </select>
+        <label>Mode:</label>
+        <select name="mode">
+            <option value="strict" {% if mode=='strict' %}selected{% endif %}>Strict</option>
+            <option value="normal" {% if mode=='normal' %}selected{% endif %}>Normal</option>
+        </select>
+        <input type="submit" value="Update">
+    </form>
+    <h2>Active Pair: {{active_pair}}</h2>
+    <h2>Price: {{price}}</h2>
+    <h2>Signal:
+        {% if signal=='BUY' %}<span class="buy">BUY (5m UP)</span>
+        {% elif signal=='SELL' %}<span class="sell">SELL (5m DOWN)</span>
+        {% else %}<span class="hold">No Signal</span>
+        {% endif %}
+    </h2>
 </body>
 </html>
