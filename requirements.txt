@@ -1,7 +1,6 @@
 flask
-gunicorn
 yfinance
 pandas
 numpy
-matplotlib
 ta
+gunicorn
