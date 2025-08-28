@@ -1,0 +1,44 @@
+body {
+    background-color: #0b0f19;
+    color: #e0e0e0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+.header {
+    margin-bottom: 20px;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+}
+.card {
+    background-color: #111;
+    border: 2px solid #0ff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 0 20px #0ff;
+}
+.card h2 {
+    color: #0ff;
+}
+.card.signal {
+    grid-column: span 2;
+    background-color: #111;
+    border-color: #f0f;
+    box-shadow: 0 0 25px #f0f;
+}
+.card.signal p {
+    font-size: 2em;
+    font-weight: bold;
+    color: #0f0;
+}
+.card.history {
+    grid-column: span 2;
+    border-color: #ff0;
+    box-shadow: 0 0 20px #ff0;
+}
+.card.history h2 {
+    color: #ff0;
+}
